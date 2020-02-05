@@ -10,8 +10,19 @@ import _ from "lodash"
 import fragmentShader from "./shaders/test.glsl"
 import vertexShader from "./shaders/defaultVertex.glsl"
 import App from './App'
-import {timer, generate, of} from "rxjs";
-import {concatMap, delay, finalize, flatMap, map, switchMap, tap} from "rxjs/operators";
+import {timer, generate, of, fromEvent} from "rxjs";
+import {
+    bufferTime,
+    concatMap,
+    debounce,
+    debounceTime,
+    delay,
+    finalize,
+    flatMap,
+    map,
+    switchMap,
+    tap
+} from "rxjs/operators";
 
 window.THREE = THREE
 
@@ -48,7 +59,9 @@ const Web = (props) => {
             camera.position.z = 5
             renderer.setSize(window.innerWidth, window.innerHeight);
         };
-        window.addEventListener('resize', onWindowResize )
+        let resizeSubscription = fromEvent(window, 'resize')
+            .pipe(bufferTime(100))
+            .subscribe(onWindowResize);
 
         let planeGeometry = new THREE.PlaneGeometry(25, 25);
 
@@ -99,7 +112,7 @@ const Web = (props) => {
         return () => {
             particleSub.unsubscribe();
             document.removeEventListener('mousemove', updateMousePosition)
-            window.removeEventListener('resize', onWindowResize)
+            resizeSubscription.unsubscribe()
         };
 
         function createParticle() {

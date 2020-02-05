@@ -28,14 +28,11 @@ const Web = (props) => {
         gui.addColor(config, 'color');
 
         let mousePosition = {x: 0, y: 0}
-
         let updateMousePosition = (evt) => {
             mousePosition = {x: evt.clientX, y: evt.clientY}
         }
 
-
         document.addEventListener('mousemove', updateMousePosition )
-
 
         let startTime = Date.now()
 
@@ -71,10 +68,8 @@ const Web = (props) => {
 
         let particleSub = timer(0, 15)
             .pipe(map(createParticle), map((particleMesh) => {
-
                 let randomAngle = _.random(0, 360) * (Math.PI / 180);
                 let direction = new THREE.Vector3(Math.cos(randomAngle), Math.sin(randomAngle));
-
                 return {particleMesh, direction}
             }))
             .subscribe(({particleMesh, direction}) => {
@@ -89,7 +84,6 @@ const Web = (props) => {
                     .subscribe(i => {
                         particleMesh.material.uniforms.transparency.value = i;
                         particleMesh.translateOnAxis(direction, 3);
-                        // particleMesh.position.y -= 0.5
                     })
             });
 
@@ -97,15 +91,6 @@ const Web = (props) => {
 
         let animate = function () {
             requestAnimationFrame(animate);
-
-            const timeNow = (Date.now() - startTime) * 0.001
-
-            // _.zip(_.range(0, planes.length), planes).map(([i, plane]) => {
-            //     const timeNow = (Date.now() - startTime) * 0.001
-            //     plane.position.x = 200 * Math.sin(timeNow + 0.25 * .5 * .5 * i);
-            //     plane.position.y = 200 * Math.cos(timeNow + 0.25 * .5 * .5 * i);
-            // })
-
             renderer.render(scene, camera);
         };
 

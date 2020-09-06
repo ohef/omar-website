@@ -30,9 +30,8 @@ const Web = (props) => {
     let canvasRef;
 
     useEffect(() => {
-
         let config = {
-            color : "#0000FF"
+            color : "#0000FF",
         };
 
         let gui = new dat.GUI();
@@ -51,7 +50,7 @@ const Web = (props) => {
         let camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 1, 1000);
         camera.position.z = 5
 
-        let renderer = new THREE.WebGLRenderer({ canvas: canvasRef });
+        let renderer = new THREE.WebGLRenderer({canvas: canvasRef, alpha: false});
         renderer.setSize(window.innerWidth, window.innerHeight);
 
         const onWindowResize = () => {
@@ -80,27 +79,36 @@ const Web = (props) => {
         }
 
         let particleSub = timer(0, 15)
-            .pipe(map(createParticle), map((particleMesh) => {
+            .pipe(
+                map(createParticle),
+                map((particleMesh) => {
                 let randomAngle = _.random(0, 360) * (Math.PI / 180);
                 let direction = new THREE.Vector3(Math.cos(randomAngle), Math.sin(randomAngle));
                 return {particleMesh, direction}
             }))
             .subscribe(({particleMesh, direction}) => {
                 scene.add(particleMesh);
-                generate(0.0, i => i <= 1.0, i => i + 0.008)
-                    .pipe(
-                        concatMap(x => of(x).pipe(delay(10))),
-                        finalize(() => {
-                            scene.remove(particleMesh);
-                        })
-                    )
-                    .subscribe(i => {
-                        particleMesh.material.uniforms.transparency.value = i;
+                let start;
+                function helper(timestamp) {
+                    if(start === undefined)
+                        start = timestamp
+
+                    const elapsed = timestamp - start;
+                    const elapsedNormal = elapsed / (3. * 1000.);
+
+                    if(elapsedNormal <= 1.0){
+                        particleMesh.material.uniforms.transparency.value = elapsedNormal;
                         particleMesh.translateOnAxis(direction, 3);
-                    })
+                        requestAnimationFrame(helper);
+                    }
+                    else{
+                        scene.remove(particleMesh)
+                    }
+                }
+                requestAnimationFrame(helper);
             });
 
-        window.scene = scene
+        window.scene = scene;
 
         let animate = function () {
             requestAnimationFrame(animate);
@@ -138,7 +146,6 @@ const Web = (props) => {
             <ReactCanvas ref={r => {canvasRef = r} } />
             <App />
         </div>)
-
 }
 
 const ReactCanvas = styled.canvas`

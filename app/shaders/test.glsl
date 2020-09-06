@@ -18,7 +18,6 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
     finalColor = vec3(1.,1.,1.);
 
-//    fragColor = vec4(finalColor * (1. - t) + t * color , 1. - t - transparency);
     fragColor = vec4( color , 1. - t - transparency);
 }
 

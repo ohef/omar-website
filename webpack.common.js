@@ -20,8 +20,16 @@ module.exports = {
             'styled-components'
           ]
         }
+      },{
+        test: /.tsx?$/,
+        loader: 'babel-loader',
+        options: {
+          presets: ["@babel/react", "@babel/preset-typescript"],
+          plugins: [ 'styled-components' ]
+        }
       },
-      { test: /.glsl$/, loader: "raw-loader"},
+        {test: [/.glb$/, /.fbx$/], loader: "arraybuffer-loader"},
+        {test: [/.glsl$/], loader: "raw-loader"},
       { test: /.woff$/, loader: "url-loader" },
       {
         test: /.css$/,
@@ -40,6 +48,6 @@ module.exports = {
     inject: true,
   })],
   resolve: {
-    extensions: ['.json', '.js', '.jsx']
+    extensions: ['.json', '.js', '.jsx', '.tsx', '.ts']
   },
 }

@@ -55,7 +55,7 @@ const Web = (props) => {
             renderer.setSize(window.innerWidth, window.innerHeight);
         };
         let resizeSubscription = fromEvent(window, 'resize')
-            .pipe(bufferTime(100))
+            .pipe(debounceTime(100))
             .subscribe(onWindowResize);
 
         let planeGeometry = new THREE.PlaneGeometry(25, 25);
